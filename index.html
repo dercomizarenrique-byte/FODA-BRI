@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Tiago | Portfolio & Student Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f906f9", // Updated to requested primary color
+                        "gold": "#FF8C00",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#1a1a1a",
+                        "accent-blue": "#00f2ff",
+                        "accent-magenta": "#ff0095",
+                        "card-dark": "rgba(38, 38, 38, 0.6)",
+                        "neutral-950": "#0a0a0a",
+                        "off-white": "#fcfcfd",
+                        "slate-panel": "#f8fafc",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "Plus Jakarta Sans", "sans-serif"],
+                        "sans": ["Inter", "Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "md": "0.375rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .andean-pattern {
+                background-image: radial-gradient(circle at 2px 2px, rgba(255, 215, 0, 0.05) 1px, transparent 0);
+                background-size: 32px 32px;
+            }
+            .andean-bg-light {
+                background-image: 
+                    linear-gradient(45deg, rgba(0,0,0,0.03) 25%, transparent 25%),
+                    linear-gradient(-45deg, rgba(0,0,0,0.03) 25%, transparent 25%),
+                    linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.03) 75%),
+                    linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.03) 75%);
+                background-size: 60px 60px;
+                background-position: 0 0, 0 30px, 30px -30px, -30px 0px;
+            }
+            .chakana-hub {
+                clip-path: polygon(25% 0%, 75% 0%, 75% 25%, 100% 25%, 100% 75%, 75% 75%, 75% 100%, 25% 100%, 25% 75%, 0% 75%, 0% 25%, 25% 25%);
+            }
+            .glass-card {
+                background: rgba(45, 45, 45, 0.6);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+            }
+            .glass-elevation {
+                background: white;
+                border: 1px solid rgba(0, 0, 0, 0.04);
+                box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02), 0 2px 8px -2px rgba(0, 0, 0, 0.03);
+            }
+            .glow-magenta { filter: drop-shadow(0 0 8px #ff0095); }
+            .glow-gold { filter: drop-shadow(0 0 8px #FFD700); }
+            .bento-grid {
+                display: grid;
+                grid-template-columns: repeat(12, 1fr);
+                grid-auto-rows: minmax(160px, auto);
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-background-dark font-sans text-slate-900 dark:text-slate-100 min-h-screen">
+    <div id="root"></div>
+
+    <!-- React and dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // --- Shared Components ---
+
+        const NavBrand = ({ mode }) => (
+            <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 ${mode === 'dark' ? 'bg-gold/10 border border-gold/30' : 'bg-slate-50 border border-slate-200'} rounded-lg flex items-center justify-center ${mode === 'dark' ? 'text-gold' : 'text-neutral-950'}`}>
+                    <span className="material-symbols-outlined text-2xl">code_blocks</span>
+                </div>
+                {mode === 'dark' ? (
+                    <h2 className="text-xl font-bold tracking-tighter uppercase">Brian <span className="text-gold">//</span> <span className="text-xs font-medium tracking-widest text-slate-400 uppercase">Tech & Design</span></h2>
+                ) : (
+                    <div className="text-neutral-950 font-display font-extrabold text-xl tracking-tight">
+                        T<span className="text-slate-300">/</span>STUDENT
+                    </div>
+                )}
+            </div>
+        );
+
+        // --- Screen 1: Designer Profile (Tiago Advanced) ---
+
+        const DesignerProfilePage = () => {
+            return (
+                <div className="andean-pattern min-h-screen">
+                    <header className="sticky top-0 z-50 border-b border-gold/20 bg-background-dark/60 backdrop-blur-xl">
+                        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                            <NavBrand mode="dark" />
+                            <nav className="hidden md:flex items-center gap-8">
+                                <Link className="text-sm font-bold text-gold transition-colors uppercase tracking-widest" to="/">Perfil</Link>
+                                <a className="text-sm font-medium text-slate-400 hover:text-gold transition-colors uppercase tracking-widest" href="#programacion">Programación</a>
+                                <Link className="text-sm font-medium text-slate-400 hover:text-gold transition-colors uppercase tracking-widest" to="/dashboard">Dashboard</Link>
+                                <a className="text-sm font-medium text-slate-400 hover:text-gold transition-colors uppercase tracking-widest" href="#foda">FODA</a>
+                            </nav>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-full border-2 border-gold/50 p-0.5 overflow-hidden">
+                                    <img alt="Tiago Profesional" className="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwzdhEvl6CpnVZ_eD-797rsARPF7jghci9pvsW90OsSQRqZFYOaHZoZ5kiOWz38E8878vEZN1z_5C6jV_ISJPFBelemKMdZ3tXSJ10qZ-omcj2GtbmntTZ7t9JY2xPbzxcAdJGmTvlMOP9A3jOzLbhHurNasI1E8JIffu85Unj-bzgakJ1dtpYu44E6-e0WsWf0MxbKbXFynQcNVP48uTVD0XpaUoFFEsdpModlHBg5pNBzwa9pkj1h_8lxHWqCUnUKzdRZKPdsU1x" />
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-7xl mx-auto px-6 py-12 relative">
+                        <div className="text-center mb-20 relative z-10">
+                            <h1 className="text-5xl md:text-8xl font-bold tracking-tighter mb-4 text-white">
+                                Diseñador Gráfico <span className="text-gold">Avanzado</span>
+                            </h1>
+                            <p className="text-lg text-gold/80 font-medium tracking-[0.4em] uppercase">
+                                Evolución Digital <span className="mx-4 text-white/20">|</span> Programming Transition
+                            </p>
+                        </div>
+
+                        <section className="mb-24 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {[
+                                { title: "Liderazgo Creativo", cat: "Colaboración", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBJ-oc_tWOnbxa6pmMGA7pBOsoB3UpJ4PCHAS1YSJifytKUKLBBUi0oJT_VLuj25jqkaH1jxt-Htb43pe2_rFIwkvYFZgPuJJZEFy5h-EO7HZHQhhFZQrHncUmds-0dNZ5T-bBr_s2IsCEULz2U_0O-UMJbxRc8uhxZdSb6YizYe_m_eDkZWYZy_6OVYGnrBd-G8cdV45ZO9jEo9TQNFFF4q6apxh3vT4xC691c_VePKNziqBJtenedW3xG-XrBt7pAg_rKzrsQUsAb", color: "text-gold" },
+                                { title: "Arquitectura de Código", cat: "Tecnología", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB4d3vqLHKURpZOdcQCsvz1mb0oI9gz63dbsFCIb3b3EJ770d_xVEN_yTatO7bT-DnxTtnk31ANTOBpNi2HXNriYRqJ1tYVn-xtAMU51fQG8THHFkfJ3-vH_nhRDOGLKr55rLZx4FBR4qgzIHGMBLRNks3GTo03Bs6fiOZxgiOesOHuY7GZWHA-mPRMziwCgBjvfjIOEO1bkccossOvBgkgphfb53KgfUQSfpB18XSUTRd5CjDSpPhHyy8JVS8zCFHj7VAYFVihjEI-", color: "text-accent-magenta" },
+                                { title: "Visión Sistémica", cat: "Estrategia", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuC_yLpiB99nbBQw7gjpajqqOMODUFMQeSZEGq0otGbCCz5pLTusiABN_0QMShBbFPgfo1bhS_Mnhr3PIV3dwTuoToMmOhC2cqH_g1usNODdAVQEIU7X7G18vczKXjs4gheqEL5ZJfHN1Axxc7tv9OJJHfomGXPSsKzp6J4T3_t8BeiMxhJghGsmHUF71d1iFCHA18uzanPPYTnx-7wm8QMcKID3zRhoEYPbQs55vRQz6hlrf-SAGECXVpKdDK4lqkQSpNlQC06OhDkH", color: "text-accent-blue" }
+                            ].map((card, i) => (
+                                <div key={i} className="glass-card rounded-2xl overflow-hidden relative h-64 group">
+                                    <img alt={card.title} className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" src={card.img} />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent"></div>
+                                    <div className="absolute bottom-6 left-6">
+                                        <p className={`${card.color} font-bold text-xs tracking-widest uppercase mb-1`}>{card.cat}</p>
+                                        <h3 className="text-xl font-bold">{card.title}</h3>
+                                    </div>
+                                </div>
+                            ))}
+                        </section>
+
+                        <section className="mb-24" id="programacion">
+                            <div className="flex flex-col items-center mb-16">
+                                <div className="h-1 w-24 bg-gold rounded-full mb-4 shadow-[0_0_15px_rgba(255,215,0,0.6)]"></div>
+                                <h2 className="text-4xl font-bold uppercase tracking-widest text-center">FODA de Programación</h2>
+                            </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                                <div className="lg:col-span-7 glass-card p-10 rounded-3xl relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 p-6">
+                                        <span className="material-symbols-outlined text-gold/20 text-5xl">radar</span>
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-slate-100 mb-2">Capacidades Técnicas</h3>
+                                    <p className="text-slate-400 text-sm mb-10 uppercase tracking-widest">Sincronía de habilidades Full-Stack & Design</p>
+                                    <div className="flex justify-center items-center py-6">
+                                        <svg className="w-full max-w-[450px] drop-shadow-2xl" viewBox="0 0 400 400">
+                                            <circle cx="200" cy="200" fill="none" r="150" stroke="rgba(255,255,255,0.05)" strokeWidth="1"></circle>
+                                            <circle cx="200" cy="200" fill="none" r="100" stroke="rgba(255,255,255,0.05)" strokeWidth="1"></circle>
+                                            <circle cx="200" cy="200" fill="none" r="50" stroke="rgba(255,255,255,0.05)" strokeWidth="1"></circle>
+                                            <line stroke="rgba(255,255,255,0.1)" x1="200" x2="200" y1="50" y2="350"></line>
+                                            <line stroke="rgba(255,255,255,0.1)" x1="50" x2="350" y1="200" y2="200"></line>
+                                            <polygon className="glow-gold transition-all duration-500 hover:fill-gold/30 cursor-pointer" fill="rgba(255, 215, 0, 0.15)" points="200,70 320,150 280,290 120,290 80,150" stroke="#FFD700" strokeWidth="3"></polygon>
+                                            <text fill="#FFD700" fontSize="12" fontWeight="bold" textAnchor="middle" x="200" y="40">UI/UX DESIGN</text>
+                                            <text fill="#ff0095" fontSize="12" fontWeight="bold" textAnchor="start" x="340" y="160">FRONTEND LOGIC</text>
+                                            <text fill="#94a3b8" fontSize="10" textAnchor="start" x="300" y="320">AI INTEGRATION</text>
+                                            <text fill="#f26c0d" fontSize="12" fontWeight="bold" textAnchor="end" x="100" y="320">ANDEAN CODING</text>
+                                            <text fill="#00f2ff" fontSize="12" fontWeight="bold" textAnchor="end" x="60" y="160">OPTIMIZATION</text>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div className="lg:col-span-5 flex flex-col gap-6">
+                                    <div className="glass-card p-6 rounded-xl border-l-4 border-l-gold group hover:bg-gold/5 transition-all">
+                                        <h4 className="text-gold font-bold uppercase tracking-widest text-sm mb-3">Fortalezas</h4>
+                                        <p className="text-slate-300 text-sm leading-relaxed">Dominio avanzado de SVG y animaciones CSS con raíces en diseño gráfico. Integración nativa de patrones andinos en estructuras de código modernas.</p>
+                                    </div>
+                                    <div className="glass-card p-6 rounded-xl border-l-4 border-l-accent-magenta group hover:bg-accent-magenta/5 transition-all">
+                                        <h4 className="text-accent-magenta font-bold uppercase tracking-widest text-sm mb-3">Debilidades</h4>
+                                        <p className="text-slate-300 text-sm leading-relaxed">Curva de aprendizaje en arquitecturas backend complejas y escalabilidad de bases de datos masivas en tiempo real.</p>
+                                    </div>
+                                    <div className="glass-card p-6 rounded-xl border-l-4 border-l-accent-blue group hover:bg-accent-blue/5 transition-all">
+                                        <h4 className="text-accent-blue font-bold uppercase tracking-widest text-sm mb-3">Oportunidades</h4>
+                                        <p className="text-slate-300 text-sm leading-relaxed">Desarrollo de herramientas No-Code con estética premium para el mercado Latinoamericano. Implementación de IA en interfaces visuales.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="mb-24" id="metricas">
+                            <div className="flex flex-col items-center mb-10">
+                                <h2 className="text-3xl font-bold uppercase tracking-widest text-center">Métricas de Conversión</h2>
+                            </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div className="glass-card p-8 rounded-2xl flex flex-col items-center relative overflow-hidden group">
+                                    <h3 className="text-xl font-bold text-slate-300 mb-8 self-start">Retorno de Inversión (ROI)</h3>
+                                    <div className="relative w-64 h-64 flex items-center justify-center">
+                                        <svg className="w-full h-full transform -rotate-90">
+                                            <circle cx="50%" cy="50%" fill="transparent" r="90" stroke="rgba(255,255,255,0.05)" strokeWidth="20"></circle>
+                                            <circle cx="50%" cy="50%" fill="transparent" r="90" stroke="url(#roi-gradient)" strokeDasharray="565" strokeDashoffset="141" strokeLinecap="round" strokeWidth="20"></circle>
+                                            <defs>
+                                                <linearGradient id="roi-gradient" x1="0%" x2="100%" y1="0%" y2="0%">
+                                                    <stop offset="0%" stopColor="#FFD700"></stop>
+                                                    <stop offset="100%" stopColor="#ff0095"></stop>
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span className="text-5xl font-bold text-white tracking-tighter">75%</span>
+                                            <span className="text-xs font-bold text-gold tracking-widest uppercase">Eficacia</span>
+                                        </div>
+                                    </div>
+                                    <div className="mt-8 grid grid-cols-3 gap-8 w-full">
+                                        <div className="text-center">
+                                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Inversión</p>
+                                            <p className="text-lg font-bold">$12.4k</p>
+                                        </div>
+                                        <div className="text-center border-x border-white/10">
+                                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Ganancia</p>
+                                            <p className="text-lg font-bold text-green-400">$93.0k</p>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Multiplicador</p>
+                                            <p className="text-lg font-bold text-accent-blue">7.5x</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="glass-card p-8 rounded-2xl flex flex-col relative group">
+                                    <h3 className="text-xl font-bold text-slate-300 mb-8">Incremento de Ventas (10x)</h3>
+                                    <div className="flex-1 flex items-end justify-between gap-4 min-h-[200px] px-2 pb-6 border-b border-white/10">
+                                        {[20, 45, 75, 100].map((h, i) => (
+                                            <div key={i} className="relative group/bar flex flex-col items-center flex-1">
+                                                <div className={`w-full ${h === 100 ? 'bg-gold/30' : 'bg-accent-blue/10'} rounded-t-sm transition-all relative`} style={{ height: `${h}%` }}>
+                                                    <div className={`absolute top-0 w-full h-1 ${h === 100 ? 'bg-gold shadow-[0_0_15px_#FFD700]' : 'bg-accent-blue shadow-[0_0_10px_#00f2ff]'}`}></div>
+                                                </div>
+                                                <span className={`text-[10px] mt-2 font-bold uppercase ${h === 100 ? 'text-gold' : 'text-slate-500'}`}>{i === 3 ? 'Objetivo' : `Q${i + 1}`}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="mt-4 flex justify-between items-center">
+                                        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-accent-blue"></span><span className="text-xs text-slate-400">Actual</span></div>
+                                        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-gold"></span><span className="text-xs text-slate-400">Proyectado (10x)</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="relative grid grid-cols-12 gap-8 items-center mb-24" id="foda">
+                            <div className="col-span-12 lg:col-span-4 flex flex-col gap-8 order-2 lg:order-1">
+                                <div className="glass-card p-6 rounded-xl border-l-4 border-l-gold group hover:scale-[1.02] transition-transform">
+                                    <div className="flex items-center gap-3 mb-4"><span className="material-symbols-outlined text-gold text-3xl">verified_user</span><h3 className="text-2xl font-bold">Fortalezas (F)</h3></div>
+                                    <ul className="space-y-3">
+                                        <li className="flex items-center gap-2 text-slate-300"><span className="w-2 h-2 rounded-full bg-gold"></span><span>Diseño UX Avanzado</span></li>
+                                        <li className="flex items-center gap-2 text-slate-300"><span className="w-2 h-2 rounded-full bg-gold/50"></span><span>Código con Identidad Cultural</span></li>
+                                    </ul>
+                                </div>
+                                <div className="glass-card p-6 rounded-xl border-l-4 border-l-accent-magenta group hover:scale-[1.02] transition-transform">
+                                    <div className="flex items-center gap-3 mb-4"><span className="material-symbols-outlined text-accent-magenta text-3xl">warning</span><h3 className="text-2xl font-bold">Debilidades (D)</h3></div>
+                                    <ul className="space-y-3">
+                                        <li className="flex items-center gap-2 text-slate-300"><span className="w-2 h-2 rounded-full bg-accent-magenta"></span><span>Especialización Backend</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="col-span-12 lg:col-span-4 flex justify-center order-1 lg:order-2 py-8 lg:py-0">
+                                <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+                                    <div className="chakana-hub w-48 h-48 md:w-60 md:h-60 bg-gradient-to-br from-gold via-accent-magenta to-accent-blue flex items-center justify-center shadow-[0_0_50px_rgba(255,215,0,0.3)]">
+                                        <div className="chakana-hub w-40 h-40 md:w-52 md:h-52 bg-[#1a1a1a] flex items-center justify-center">
+                                            <span className="material-symbols-outlined text-6xl text-gold glow-gold">integration_instructions</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-span-12 lg:col-span-4 flex flex-col gap-8 order-3 lg:order-3">
+                                <div className="glass-card p-6 rounded-xl border-r-4 border-r-accent-blue group hover:scale-[1.02] transition-transform text-right">
+                                    <div className="flex items-center gap-3 mb-4 justify-end"><h3 className="text-2xl font-bold">Oportunidades (O)</h3><span className="material-symbols-outlined text-accent-blue text-3xl">trending_up</span></div>
+                                    <ul className="space-y-3"><li className="flex items-center gap-2 justify-end text-slate-300"><span>Tech-Stack Híbrido</span><span className="w-2 h-2 rounded-full bg-accent-blue"></span></li></ul>
+                                </div>
+                            </div>
+                        </section>
+                    </main>
+
+                    <footer className="border-t border-gold/10 bg-black/40 backdrop-blur-md py-12">
+                        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div className="flex items-center gap-4">
+                                <span className="text-slate-500 text-xs tracking-widest uppercase">System V.4.0.0</span>
+                                <span className="w-1 h-1 rounded-full bg-slate-700"></span>
+                                <span className="text-slate-500 text-xs tracking-widest uppercase">Identity: Verified</span>
+                            </div>
+                            <button className="px-6 py-2 bg-gold/10 hover:bg-gold/20 text-gold border border-gold/50 rounded-lg font-bold text-sm flex items-center gap-2 transition-all">
+                                <span className="material-symbols-outlined text-sm">download</span> DESCARGAR PERFIL TÉCNICO
+                            </button>
+                        </div>
+                        <div className="text-center mt-8 text-slate-700 text-[10px] uppercase tracking-[0.5em]">
+                            © 2024 Andean-Tech Personal OS - Tiago Advanced Design & Coding
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        // --- Screen 2: Student Dashboard (Contemporary Insight) ---
+
+        const StudentDashboardPage = () => {
+            return (
+                <div className="andean-bg-light bg-white text-slate-900 min-h-screen">
+                    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+                        <div className="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
+                            <NavBrand mode="light" />
+                            <nav className="hidden md:flex items-center gap-10">
+                                <Link className="text-xs font-bold uppercase tracking-widest text-neutral-950" to="/dashboard">Overview</Link>
+                                <a className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-neutral-950 transition-colors" href="#">Analytics</a>
+                                <Link className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-neutral-950 transition-colors" to="/">Main Portfolio</Link>
+                            </nav>
+                            <div className="flex items-center gap-4">
+                                <div className="h-10 w-10 rounded-full overflow-hidden border border-slate-200">
+                                    <img alt="Student Profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwzdhEvl6CpnVZ_eD-797rsARPF7jghci9pvsW90OsSQRqZFYOaHZoZ5kiOWz38E8878vEZN1z_5C6jV_ISJPFBelemKMdZ3tXSJ10qZ-omcj2GtbmntTZ7t9JY2xPbzxcAdJGmTvlMOP9A3jOzLbhHurNasI1E8JIffu85Unj-bzgakJ1dtpYu44E6-e0WsWf0MxbKbXFynQcNVP48uTVD0XpaUoFFEsdpModlHBg5pNBzwa9pkj1h_8lxHWqCUnUKzdRZKPdsU1x" />
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-7xl mx-auto px-8 py-12">
+                        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-extrabold tracking-[0.3em] text-slate-400 uppercase">First Year Development</span>
+                                <h1 className="text-5xl font-display font-extrabold text-neutral-950 tracking-tight">
+                                    Student <span className="text-slate-300 font-light underline decoration-1 underline-offset-8">Insight</span>
+                                </h1>
+                            </div>
+                            <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-slate-100 shadow-sm">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Current Semester: 01</span>
+                            </div>
+                        </div>
+
+                        <div className="bento-grid">
+                            {/* Skill Radar */}
+                            <div className="col-span-12 lg:col-span-4 row-span-3 glass-elevation rounded-[2.5rem] p-10 flex flex-col">
+                                <div className="mb-10">
+                                    <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-1">Core Competencies</h3>
+                                    <p className="text-xl font-bold text-neutral-950">Skill Distribution</p>
+                                </div>
+                                <div className="flex-grow flex items-center justify-center">
+                                    <svg className="w-full max-w-[280px]" viewBox="0 0 400 400">
+                                        <circle cx="200" cy="200" fill="none" r="160" stroke="#f1f5f9" strokeWidth="1"></circle>
+                                        <circle cx="200" cy="200" fill="none" r="120" stroke="#f1f5f9" strokeWidth="1"></circle>
+                                        <circle cx="200" cy="200" fill="none" r="80" stroke="#f1f5f9" strokeWidth="1"></circle>
+                                        <line stroke="#f1f5f9" strokeWidth="1" x1="200" x2="200" y1="40" y2="360"></line>
+                                        <line stroke="#f1f5f9" strokeWidth="1" x1="40" x2="360" y1="200" y2="200"></line>
+                                        <polygon fill="rgba(203, 213, 225, 0.2)" points="200,60 330,150 280,320 120,320 70,150" stroke="#94a3b8" strokeWidth="1.5"></polygon>
+                                        <text className="text-[10px] font-bold fill-slate-500 uppercase" textAnchor="middle" x="200" y="25">Logic</text>
+                                        <text className="text-[10px] font-bold fill-slate-500 uppercase" textAnchor="start" x="350" y="160">HTML/CSS</text>
+                                        <text className="text-[10px] font-bold fill-slate-500 uppercase" textAnchor="end" x="50" y="160">Algorithms</text>
+                                    </svg>
+                                </div>
+                                <div className="mt-10 pt-8 border-t border-slate-50">
+                                    <div className="flex items-center gap-4">
+                                        <span className="material-symbols-outlined text-slate-300">terminal</span>
+                                        <p className="text-sm text-slate-500 leading-relaxed italic">"Architecture through logic, aesthetics through code."</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Hero Image Block */}
+                            <div className="col-span-12 lg:col-span-8 row-span-2 relative group overflow-hidden rounded-[2.5rem] glass-elevation">
+                                <img alt="Workspace" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_yLpiB99nbBQw7gjpajqqOMODUFMQeSZEGq0otGbCCz5pLTusiABN_0QMShBbFPgfo1bhS_Mnhr3PIV3dwTuoToMmOhC2cqH_g1usNODdAVQEIU7X7G18vczKXjs4gheqEL5ZJfHN1Axxc7tv9OJJHfomGXPSsKzp6J4T3_t8BeiMxhJghGsmHUF71d1iFCHA18uzanPPYTnx-7wm8QMcKID3zRhoEYPbQs55vRQz6hlrf-SAGECXVpKdDK4lqkQSpNlQC06OhDkH" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/40 to-transparent flex items-end p-12">
+                                    <div className="text-white max-w-sm">
+                                        <h2 className="text-3xl font-display font-extrabold mb-2">Modern Foundations</h2>
+                                        <p className="text-sm text-white/80 leading-relaxed font-medium">Bridging the gap between contemporary programming and traditional creative precision.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Stat Cards */}
+                            <div className="col-span-12 md:col-span-4 row-span-1 glass-elevation rounded-[2rem] p-8">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h4 className="text-xs font-extrabold text-emerald-500 uppercase tracking-widest">Strengths</h4>
+                                    <span className="material-symbols-outlined text-emerald-200">bolt</span>
+                                </div>
+                                <p className="text-sm font-semibold text-neutral-950 mb-2">High Adaptability</p>
+                                <p className="text-xs text-slate-500 leading-relaxed">Fast-paced learning curve in modern framework adoption and visual problem solving.</p>
+                            </div>
+
+                            <div className="col-span-12 md:col-span-4 row-span-1 glass-elevation rounded-[2rem] p-8">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h4 className="text-xs font-extrabold text-blue-500 uppercase tracking-widest">Opportunities</h4>
+                                    <span className="material-symbols-outlined text-blue-200">rocket_launch</span>
+                                </div>
+                                <p className="text-sm font-semibold text-neutral-950 mb-2">Startup Ecosystem</p>
+                                <p className="text-xs text-slate-500 leading-relaxed">Access to local internship programs and university hackathon competitions.</p>
+                            </div>
+
+                            {/* Growth & Market */}
+                            <div className="col-span-12 md:col-span-6 row-span-1 glass-elevation rounded-[2rem] p-8 flex items-center gap-8">
+                                <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0">
+                                    <span className="material-symbols-outlined text-slate-300">work_off</span>
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-1">Area of Growth</h4>
+                                    <p className="text-sm font-semibold text-neutral-950">Real-world Production Experience</p>
+                                    <p className="text-xs text-slate-500 mt-1">Limited exposure to large-scale collaborative codebases.</p>
+                                </div>
+                            </div>
+
+                            {/* Progress Bars */}
+                            <div className="col-span-12 lg:col-span-4 row-span-2 glass-elevation rounded-[2.5rem] p-10">
+                                <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-8">Academic Progress</h3>
+                                <div className="space-y-10">
+                                    {[
+                                        { label: 'Data Structures', val: '85%', icon: 'database' },
+                                        { label: 'Loops & Logic', val: '92%', icon: 'code' },
+                                        { label: 'Functional JS', val: '60%', icon: 'javascript' }
+                                    ].map((skill, idx) => (
+                                        <div key={idx} className="group">
+                                            <div className="flex justify-between items-center mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="material-symbols-outlined text-slate-400 text-sm">{skill.icon}</span>
+                                                    <span className="text-xs font-bold text-neutral-950 uppercase">{skill.label}</span>
+                                                </div>
+                                                <span className="text-[10px] font-extrabold text-slate-400">{skill.val}</span>
+                                            </div>
+                                            <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                                                <div className="h-full bg-neutral-950 transition-all duration-1000" style={{ width: skill.val }}></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="col-span-12 lg:col-span-5 row-span-2 glass-elevation rounded-[2.5rem] overflow-hidden group">
+                                <img alt="Collaboration" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ-oc_tWOnbxa6pmMGA7pBOsoB3UpJ4PCHAS1YSJifytKUKLBBUi0oJT_VLuj25jqkaH1jxt-Htb43pe2_rFIwkvYFZgPuJJZEFy5h-EO7HZHQhhFZQrHncUmds-0dNZ5T-bBr_s2IsCEULz2U_0O-UMJbxRc8uhxZdSb6YizYe_m_eDkZWYZy_6OVYGnrBd-G8cdV45ZO9jEo9TQNFFF4q6apxh3vT4xC691c_VePKNziqBJtenedW3xG-XrBt7pAg_rKzrsQUsAb" />
+                            </div>
+
+                            <div className="col-span-12 lg:col-span-3 row-span-2 glass-elevation rounded-[2.5rem] p-10 bg-neutral-950 text-white flex flex-col justify-center">
+                                <span className="material-symbols-outlined text-slate-600 mb-6 text-3xl">auto_awesome</span>
+                                <h3 className="text-xl font-display font-bold mb-4 italic">Andean-Tech Mission</h3>
+                                <p className="text-sm text-slate-400 leading-relaxed font-light">
+                                    Merging the precision of ancestral Andean pattern-weaving with the strict architecture of modern software development.
+                                </p>
+                            </div>
+                        </div>
+                    </main>
+
+                    <footer className="mt-24 border-t border-slate-100 bg-white py-12">
+                        <div className="max-w-7xl mx-auto px-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded bg-slate-50 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-slate-400 text-lg">layers</span>
+                                </div>
+                                <span className="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">Academic Dashboard v2.0</span>
+                            </div>
+                            <div className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">
+                                © 2024 Tiago — First Year Portfolio
+                            </div>
+                            <button className="px-6 py-2.5 bg-neutral-950 text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-all">
+                                Export Data
+                            </button>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        // --- Root App ---
+
+        const App = () => {
+            const location = useLocation();
+
+            // Toggle Dark Mode Class based on route
+            useEffect(() => {
+                if (location.pathname === '/') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }, [location.pathname]);
+
+            return (
+                <Routes>
+                    <Route path="/" element={<DesignerProfilePage />} />
+                    <Route path="/dashboard" element={<StudentDashboardPage />} />
+                </Routes>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = createRoot(container);
+        root.render(
+            <MemoryRouter>
+                <App />
+            </MemoryRouter>
+        );
+    </script>
+</body>
+
+</html>
